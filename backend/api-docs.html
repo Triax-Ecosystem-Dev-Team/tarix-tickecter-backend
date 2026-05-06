@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarix Ticketer API Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --bg: #f8fafc;
+            --sidebar-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --code-bg: #1e293b;
+            --code-text: #f8fafc;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        aside {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 2rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-group {
+            margin-bottom: 2rem;
+        }
+
+        .nav-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.5rem 0;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        main {
+            margin-left: 280px;
+            flex: 1;
+            padding: 3rem 4rem;
+            max-width: 1000px;
+        }
+
+        header {
+            margin-bottom: 4rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 3rem 0 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+
+        .endpoint {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .endpoint-header {
+            padding: 1rem 1.5rem;
+            background: #fcfcfc;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .method {
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #fff;
+        }
+
+        .method.get { background-color: #3b82f6; }
+        .method.post { background-color: #10b981; }
+        .method.put { background-color: #f59e0b; }
+        .method.delete { background-color: #ef4444; }
+        .method.patch { background-color: #6366f1; }
+
+        .path {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        .endpoint-body {
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.25rem;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: #f1f5f9;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: var(--primary-dark);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-auth { background: #fee2e2; color: #ef4444; }
+        .badge-public { background: #dcfce7; color: #166534; }
+
+        .troubleshooting {
+            background: #fff;
+            border: 1px solid #fed7aa;
+            border-left: 4px solid #f59e0b;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            aside { display: none; }
+            main { margin-left: 0; padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <aside>
+        <div class="logo">
+            <span>🚌</span> Tarix API
+        </div>
+        
+        <div class="nav-group">
+            <div class="nav-title">Introduction</div>
+            <a href="#overview" class="nav-link">Overview</a>
+            <a href="#authentication" class="nav-link">Authentication</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-title">Dispatch Monitoring</div>
+            <a href="#dispatch-fleet" class="nav-link">Live Fleet Status</a>
+            <a href="#dispatch-sales" class="nav-link">Daily Sales Stats</a>
+            <a href="#dispatch-status" class="nav-link">Update Trip Status</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-title">Auth Endpoints</div>
+            <a href="#auth-register" class="nav-link">Register</a>
+            <a href="#auth-login" class="nav-link">Login</a>
+            <a href="#auth-me" class="nav-link">Get Profile</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-title">Trips</div>
+            <a href="#trips-get" class="nav-link">List Trips</a>
+            <a href="#trips-post" class="nav-link">Create Trip</a>
+            <a href="#trips-id" class="nav-link">Trip Details</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-title">Bookings</div>
+            <a href="#bookings-post" class="nav-link">Create Booking</a>
+            <a href="#bookings-get" class="nav-link">My Bookings</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-title">Admin Management</div>
+            <a href="#admin-staff" class="nav-link">Staff Management</a>
+            <a href="#admin-drivers" class="nav-link">Driver Management</a>
+            <a href="#admin-revenue" class="nav-link">Revenue Trend</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-title">System Settings</div>
+            <a href="#settings-get" class="nav-link">Get Settings</a>
+            <a href="#settings-put" class="nav-link">Update Settings</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-title">User Profile & Security</div>
+            <a href="#user-profile" class="nav-link">Update Profile</a>
+            <a href="#user-password" class="nav-link">Change Password</a>
+            <a href="#user-2fa" class="nav-link">Toggle 2FA</a>
+            <a href="#user-preferences" class="nav-link">Update Preferences</a>
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <h1 id="overview">Tarix Ticketer API Documentation</h1>
+            <p>Complete guide to integrating with the Tarix Ticketer backend services. Base URL: <code>http://localhost:5000/api</code></p>
+        </header>
+
+        <section id="authentication">
+            <h2>Authentication</h2>
+            <p>We use JWT-based authentication. Pass the token in the <code>Authorization</code> header for all private routes.</p>
+            <pre>Authorization: Bearer <your_jwt_token></pre>
+        </section>
+
+        <!-- DISPATCH SECTION -->
+        <h2 id="dispatch">Dispatch Monitoring</h2>
+
+        <div class="endpoint" id="dispatch-fleet">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="path">/dispatch/fleet-status</span>
+                <span class="badge badge-auth">Private</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Fetch real-time occupancy and status for all active and scheduled trips. Uses dynamic <strong>Manufacturer + Model</strong> naming logic.</p>
+                <div class="section-title">Access Role</div>
+                <p>Admin, Ticketer</p>
+            </div>
+        </div>
+
+        <div class="endpoint" id="dispatch-sales">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="path">/dispatch/sales-stats</span>
+                <span class="badge badge-auth">Private</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Fetch daily revenue overview grouped by payment method (Cash, Transfer, Card).</p>
+                <div class="section-title">Success Response (200)</div>
+                <pre>{
+  "success": true,
+  "data": {
+    "totalTickets": 45,
+    "totalRevenue": 850000,
+    "breakdown": [
+      { "method": "Cash", "count": 20, "amount": 350000 },
+      { "method": "Transfer", "count": 15, "amount": 300000 },
+      { "method": "Card", "count": 10, "amount": 200000 }
+    ]
+  }
+}</pre>
+            </div>
+        </div>
+
+        <div class="endpoint" id="dispatch-status">
+            <div class="endpoint-header">
+                <span class="method patch">PATCH</span>
+                <span class="path">/dispatch/trips/:id/status</span>
+                <span class="badge badge-auth">Private</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Manually update a trip's lifecycle status.</p>
+                <div class="section-title">Valid Enums</div>
+                <code>Scheduled</code>, <code>Active</code>, <code>InTransit</code>, <code>Completed</code>, <code>Delayed</code>, <code>Cancelled</code>
+            </div>
+        </div>
+
+        <!-- AUTH SECTION -->
+        <h2 id="auth">Auth Endpoints</h2>
+
+        <div class="endpoint" id="auth-register">
+            <div class="endpoint-header">
+                <span class="method post">POST</span>
+                <span class="path">/auth/register</span>
+                <span class="badge badge-public">Public</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Register a new user account.</p>
+            </div>
+        </div>
+
+        <div class="endpoint" id="auth-login">
+            <div class="endpoint-header">
+                <span class="method post">POST</span>
+                <span class="path">/auth/login</span>
+                <span class="badge badge-public">Public</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Login and get an access token.</p>
+                <div class="section-title">Request Body</div>
+                <pre>{
+  "email": "admin@tarix.com",
+  "password": "password123"
+}</pre>
+            </div>
+        </div>
+
+        <!-- TRIPS SECTION -->
+        <h2 id="trips">Trips Management</h2>
+
+        <div class="endpoint" id="trips-get">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="path">/trips</span>
+                <span class="badge badge-public">Public</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Search and list available trips. Returns professional branding and real vehicle capacity.</p>
+            </div>
+        </div>
+
+        <!-- BOOKINGS SECTION -->
+        <h2 id="bookings">Bookings</h2>
+
+        <div class="endpoint" id="bookings-post">
+            <div class="endpoint-header">
+                <span class="method post">POST</span>
+                <span class="path">/bookings</span>
+                <span class="badge badge-auth">Private</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Create a booking. Note: <code>paymentMethod</code> must be one of <code>Cash</code>, <code>Transfer</code>, or <code>Card</code>.</p>
+            </div>
+        </div>
+
+        <!-- USER PROFILE SECTION -->
+        <h2 id="user-profile">User Profile & Security</h2>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method patch">PATCH</span>
+                <span class="path">/users/profile</span>
+                <span class="badge badge-auth">Private</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Update user profile details. This endpoint supports avatar uploads using <strong>multipart/form-data</strong>.</p>
+                <div class="section-title">Form Data Fields</div>
+                <table>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><code>name</code></td>
+                        <td>String</td>
+                        <td>User's full name.</td>
+                    </tr>
+                    <tr>
+                        <td><code>phone</code></td>
+                        <td>String</td>
+                        <td>Contact phone number.</td>
+                    </tr>
+                    <tr>
+                        <td><code>avatar</code></td>
+                        <td>File</td>
+                        <td>Image file (JPG/PNG/WEBP). Uploaded to Supabase.</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="endpoint" id="user-password">
+            <div class="endpoint-header">
+                <span class="method patch">PATCH</span>
+                <span class="path">/users/security/password</span>
+                <span class="badge badge-auth">Private</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Update account password. Requires current password verification.</p>
+            </div>
+        </div>
+
+        <div class="troubleshooting" id="frontend-issues">
+            <h3>DevOps Checklist</h3>
+            <ul>
+                <li><strong>Supabase Storage:</strong> Public URL generated for <code>profiles</code> bucket.</li>
+                <li><strong>Prisma 7:</strong> Manage connections in <code>prisma.config.ts</code>.</li>
+                <li><strong>CORS:</strong> Ensure origin matches your frontend environment.</li>
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        document.querySelectorAll('.nav-link').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

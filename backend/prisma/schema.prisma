@@ -1,0 +1,306 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  Ticketer
+  Admin
+  Passenger
+}
+
+enum Title {
+  Mr
+  Mrs
+  Miss
+  Dr
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  cancelled
+}
+
+enum PaymentStatus {
+  pending
+  completed
+  failed
+  refunded
+}
+
+// Updated: Professional naming for Sales Overview grouping
+enum PaymentMethod {
+  card
+  cash
+  transfer
+}
+
+// Added: New TripStatus enum for robust lifecycle tracking
+enum TripStatus {
+  Scheduled
+  Active
+  InTransit
+  Completed
+  Delayed
+  Cancelled
+}
+
+model User {
+  id              String    @id @default(uuid())
+  name            String
+  email           String    @unique
+  password        String
+  role            Role      @default(Passenger)
+  avatar          String?
+  phone           String?
+  twoFaEnabled    Boolean   @default(false)
+  theme           String    @default("light")
+  notifEmail      Boolean   @default(true)
+  notifSms        Boolean   @default(true)
+  notifPush       Boolean   @default(true)
+  ticketer        Ticketer?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Passenger{
+  id String @id @default(uuid())
+  loginId String @unique
+  title Title @default(Mr)
+  surname String
+  firstname String
+  dateOfBirth DateTime
+  occupation String
+  state String
+  localGovernment String
+  nationality String
+  address String
+  phone String
+  officePhone String
+  email                 String?
+  password              String?   @default("")
+  nextOfKinName String
+  nextOfKinPhone String
+  nextOfKinAddress String
+  nextOfKinRelationship String
+  bookings Booking[]
+}
+
+model Trip {
+  id                String    @id @default(uuid())
+  departureDate     DateTime
+  departureTime     String
+  departureTerminal String
+  arrivalTerminal   String
+  availableSeats    Int
+  price             Float
+  busId             String?
+  driverId          String?
+  bookings          Booking[]
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  bus               Bus?      @relation(fields: [busId], references: [id])
+  driver            Driver?   @relation(fields: [driverId], references: [id])
+  busModelId        String?
+  busModel          BusModel? @relation(fields: [busModelId], references: [id])
+  
+  // Updated: Now using TripStatus enum with Scheduled as the default
+  status            TripStatus @default(Scheduled)
+  actualArrival     String?
+}
+
+model Booking {
+  id              String         @id @default(uuid())
+  tripId          String
+  PassengerId     String
+  ticketerId      String?
+  seats           Int
+  bookedSeats     String[]
+  totalPrice      Float
+  status          BookingStatus  @default(pending)
+  paymentMethod     PaymentMethod?
+  paymentStatus     PaymentStatus  @default(pending)
+  paymentReference  String?        
+  hasExtraBaggage   Boolean        @default(false)
+  extraBaggage    Int            @default(0)
+  baggageFee      Float          @default(0.0)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  trip            Trip        @relation(fields: [tripId], references: [id])
+  passenger       Passenger   @relation(fields: [PassengerId], references: [id])
+  ticketer        Ticketer?   @relation(fields: [ticketerId], references: [id])
+  payments        Payment[]
+}
+
+model Ticketer {
+  id                    String    @id @default(uuid())
+  userId                String    @unique
+  phone                 String
+  idNumber              String
+  homeAddress           String
+  station               String?
+  workShift             String?
+  employmentDate        DateTime?
+  monthlySalary         Float?
+  nextOfKinName         String?
+  nextOfKinPhone        String?
+  nextOfKinRelationship String?
+  nextOfKinAddress      String?
+  profilePhotoUrl       String?
+  walletBalance         Float     @default(0.0)
+  bookings              Booking[]
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Driver {
+  id                    String   @id @default(uuid())
+  driverId              String   @unique
+  fullName              String
+  email                 String   @unique
+  phone                 String
+  bloodGroup            String?
+  homeAddress           String
+  licenseNumber         String   @unique
+  yearsOfExperience     Int
+  licenseIssueDate      DateTime
+  licenseExpiryDate     DateTime
+  assignedBusId         String?  @unique
+  status                String   @default("Active")
+  employmentDate        DateTime
+  monthlySalary         Float
+  emergencyContactName  String
+  emergencyContactPhone String
+  profilePhotoUrl       String?
+  licenseFileUrl        String?
+  ninFileUrl            String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  assignedBus Bus? @relation(fields: [assignedBusId], references: [id])
+  trips       Trip[]
+}
+
+model Bus {
+  id                 String    @id @default(uuid())
+  registrationNumber String    @unique
+  nickname           String?   // Used for dynamic naming logic
+  chassisNumber      String    @unique
+  engineNumber       String    @unique
+  ownerName          String
+  ownerPhone         String
+  registrationDate   DateTime?
+  insuranceProvider  String?
+  insuranceExpiry    DateTime?
+  
+  // Professional Brand Identifiers
+  manufacturer       String
+  model              String
+  
+  year               Int
+  color              String
+  fuelType           String
+  
+  // Explicit Capacity field
+  totalCapacity      Int
+  
+  availableSeats     Int
+  wheelchairSeats    Int?
+  busLength          Float?
+  busWidth           Float?
+  busHeight          Float?
+  currentMileage     Int?
+  lastServiceDate    DateTime?
+  nextServiceDue     DateTime?
+  engineCapacity     Int?
+  maintenanceStatus  String
+  transmissionType   String
+  amenities          String[]
+
+  vehicleRegistrationCertUrl String?
+  insuranceCertUrl           String?
+  roadworthinessCertUrl      String?
+  inspectionReportUrl        String?
+  emissionTestCertUrl        String?
+  busPhotosUrls              String[]
+
+  driver    Driver?
+  status    String    @default("Available")
+  trips     Trip[]
+  busModelId String?
+  busModel   BusModel? @relation(fields: [busModelId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id        String        @id @default(uuid())
+  bookingId String
+  amount    Float
+  method    PaymentMethod
+  status    PaymentStatus @default(pending)
+  reference String?       @unique
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+}
+
+model SystemSettings {
+  id                String   @id @default(uuid())
+  extraBaggagePrice Float    @default(2000)
+  updatedAt         DateTime @updatedAt
+}
+
+model BusModel {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  basePrice  Float
+  seatMatrix Json
+  trips      Trip[]
+  buses      Bus[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  category    String   
+  amount      Float
+  date        DateTime @default(now())
+  description String?
+  status      String   @default("On Budget") 
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ReportSchedule {
+  id         String   @id @default(uuid())
+  reportType String
+  frequency  String
+  time       String
+  recipients String
+  status     String   @default("Active")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ReportHistory {
+  id          String   @id @default(uuid())
+  name        String
+  type        String
+  generatedAt DateTime @default(now())
+  fileUrl     String?
+  format      String
+  size        String?
+  status      String   @default("Ready")
+  createdAt   DateTime @default(now())
+}
