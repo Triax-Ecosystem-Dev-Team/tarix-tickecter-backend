@@ -16,7 +16,7 @@
   for = "/*"
   [headers.values]
     # Restricts where the browser can make network requests
-    Content-Security-Policy = "connect-src 'self' http://localhost:5000 https://tarix-backend.netlify.app;"
+    Content-Security-Policy = "connect-src 'self' https://tarix-backend.netlify.app;"
     # Recommended: Basic security headers
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
