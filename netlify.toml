@@ -1,7 +1,9 @@
 [build]
-  # Install dependencies and generate the Prisma client before deploy
+  # Tell Netlify the actual source code lives in /backend
+  base = "backend"
+  # Install dependencies and generate the Prisma client
   command = "npm install && npx prisma generate"
-  # Path to serverless functions, relative to the base directory
+  # Path to serverless functions, relative to base directory
   functions = "netlify/functions"
 
 [[redirects]]
