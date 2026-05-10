@@ -1,8 +1,23 @@
 [build]
+  # The command to install dependencies and generate the Prisma client
   command = "npm install && npx prisma generate"
+  # The directory where your serverless functions are located
   functions = "netlify/functions"
+  # Since your code is in a 'backend' subdirectory, ensure this is set if not already
+  publish = "backend"
 
 [[redirects]]
+  # Redirects all incoming traffic to your serverless API function
   from = "/*"
   to = "/.netlify/functions/api"
   status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Restricts where the browser can make network requests
+    Content-Security-Policy = "connect-src 'self' http://localhost:5000 https://tarix-backend.netlify.app;"
+    # Recommended: Basic security headers
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
